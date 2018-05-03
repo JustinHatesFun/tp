@@ -109,3 +109,5 @@ def returnCalendar():
         calendar.append((start, event['summary']))
     return calendar
     
+print(returnNews())
+    
