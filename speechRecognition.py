@@ -6,7 +6,7 @@ import speech_recognition as sr
    https://pypi.org/project/SpeechRecognition/2.1.3/"""
 
 def recognizeSpeech():
-    
+    print("hit")
     r = sr.Recognizer()
     mic = sr.Microphone(device_index=0)
 
