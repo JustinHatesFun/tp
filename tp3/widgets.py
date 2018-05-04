@@ -37,13 +37,11 @@ data.radius = 20
 data.margin = 10
 data.alert = ""
 
+"""Guide to threading
+https://docs.python.org/2/library/threa"""
 
 thread = threading.Thread(target=recognizeSpeech, args=())
 thread.start()
-  
-print(thread)
-        
-        
 
 class Clock(Frame):
     
@@ -558,7 +556,6 @@ class FullscreenWindow:
         self.tk.bind("<Return>", self.toggleFullscreen)
         self.tk.bind("<Escape>", self.endFullscreen)
         
-        
         # Creates instances of each class created
         self.greeting = Greeting(self.topFrame)
         self.clock = Clock(self.topFrame)
@@ -583,15 +580,16 @@ class FullscreenWindow:
             #the widgets are placed again
             if self.run == True and self.displayed == False:
                 self.toggleDisplayOn()
-                #self.toggleGreetingOn()
+                self.greeting.returnUser()
+                self.toggleGreetingOn()
             #If the screen is displaying widgets but no face is detected, 
             #the widgets are temporarily removed
             if self.run == False and self.displayed == True:
                 self.toggleDisplayOff()
-                #self.toggleGreetingOff()
+                self.toggleGreetingOff()
             if self.run == False and self.displayed == False:
                 self.toggleDisplayOff()
-                #self.toggleGreetingOff()
+                self.toggleGreetingOff()
         #Function continues to call itself every 100 ms
         self.tk.after(longerTimerDelay, self.checkFaces)
         self.tk.after(100*timerDelay, self.checkHands)
@@ -603,9 +601,8 @@ class FullscreenWindow:
         # Busy environments will often mistake background as two fingers so more
         # must be used to initiate speech commands
         if self.run == True and self.listening == False and \
-        returnFingers() >= 2:
+        returnFingers() >= 3:
             data.alert = "* Listening *"
-            print(data.alert)
             self.greeting.returnUser()
             self.tk.after(10*timerDelay, self.checkSpeech())
         self.tk.after(longerTimerDelay, self.checkHands)
@@ -629,13 +626,17 @@ class FullscreenWindow:
                     if command == "on":
                         self.frozen = True
                         self.toggleDisplayOff()
-                        #self.toggleGreetingOff()
+                        self.toggleGreetingOff()
                     if command == "off":
                         self.frozen = False
                         self.toggleDisplayOn() 
-                        #self.toggleGreetingOn()
+                        self.toggleGreetingOn()
         data.alert = ""
         self.greeting.returnUser()
+        # Sometimes gets caught in a loop of 
+        self.tk.after(50*longerTimerDelay, self.finishedListening)
+        
+    def finishedListening(self):
         self.listening = False
             
     # Turns off the rest of the display and places forecast
@@ -645,7 +646,7 @@ class FullscreenWindow:
         self.toggleGreetingOff()
         self.forecast.place(bordermode=OUTSIDE, relx=0.5, rely=0.5, 
             anchor=CENTER)
-        self.tk.after(100*timerDelay, self.toggleForecastOff)
+        self.tk.after((100*timerDelay)/2, self.toggleForecastOff)
         
     # Displays the main after a certain amount of time and removes forecast
     def toggleForecastOff(self):
@@ -661,21 +662,22 @@ class FullscreenWindow:
         self.toggleGreetingOff()
         self.article.place(bordermode=OUTSIDE, relx=0.5, rely=0.5, 
             anchor=CENTER)
-        self.tk.after(100*timerDelay, self.toggleArticleOff)
+        self.tk.after((100*timerDelay)/2, self.toggleArticleOff)
         
     # After some time changes article back to main screen
     def toggleArticleOff(self):
         self.frozen = False
         self.article.place_forget()
         self.toggleDisplayOn()
-        #self.toggleGreetingOn()
+        self.greeting.returnUser()
+        self.toggleGreetingOn()
         
     # Initially displays greeting for user and disappears after a short time
     def toggleGreetingOn(self):
         self.greeting.returnUser()
         self.greeting.place(bordermode=OUTSIDE, relx=0.5, rely=0.5, y = +200, 
             anchor=CENTER)
-        #self.tk.after(100*timerDelay, self.toggleGreetingOff)
+        self.tk.after(100*timerDelay, self.toggleGreetingOff)
         
     def toggleGreetingOff(self):
         self.greeting.place_forget()
@@ -686,11 +688,8 @@ class FullscreenWindow:
         self.news.pack(side=LEFT, anchor=S, padx=(100,10), pady=60)
         self.calender.pack(side=RIGHT, anchor=S, padx=(10,100), pady=60)
         self.weather.pack(side=LEFT, anchor=N, padx=100, pady=(60,10))
-        
         self.greeting.returnUser()
-        self.greeting.place(bordermode=OUTSIDE, relx=0.5, rely=0.5, y = +200, 
-            anchor=CENTER)
-        
+        self.toggleGreetingOn()
         self.displayed = True
         
 # If display was on but a face is no longer present display toggles off
@@ -699,8 +698,9 @@ class FullscreenWindow:
         self.news.pack_forget()
         self.calender.pack_forget()
         self.weather.pack_forget()
-        #self.toggleForecastOff()
-        #self.toggleGreetingOff()
+        self.toggleForecastOff()
+        self.toggleGreetingOff()
+        self.toggleArticleOff()
         self.displayed = False
         
     # Bool for fullscreen changes each time this function is called
