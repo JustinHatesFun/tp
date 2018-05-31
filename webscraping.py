@@ -17,8 +17,8 @@ import logging
 def returnForecast():
     
     forecast = {}
-    # Sometimes the website is down and causes errors
     
+    # Sometimes the website is down and causes errors
     try:
         
         page =  requests.get("https://forecast.weather.gov/MapClick.php?x=212&y=" + 
@@ -108,6 +108,4 @@ def returnCalendar():
         #print(start, event['summary'])
         calendar.append((start, event['summary']))
     return calendar
-    
-print(returnNews())
-    
+        

@@ -37,8 +37,10 @@ data.radius = 20
 data.margin = 10
 data.alert = ""
 
+"""Guide to threading
+https://docs.python.org/2/library/threa"""
 
-thread = threading.Thread(target=returnFaces, args=())
+thread = threading.Thread(target=recognizeSpeech, args=())
 thread.start()
 
 class Clock(Frame):
@@ -553,7 +555,6 @@ class FullscreenWindow:
         self.state = False
         self.tk.bind("<Return>", self.toggleFullscreen)
         self.tk.bind("<Escape>", self.endFullscreen)
-        
         
         # Creates instances of each class created
         self.greeting = Greeting(self.topFrame)
